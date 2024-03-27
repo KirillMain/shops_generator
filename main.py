@@ -10,10 +10,6 @@ from handlers import commands
 from config_reader import config
 
 
-# if __name__ == '__main__':
-#     parse()
-
-
 async def main():
     bot = Bot(config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode='HTML'))
     dp = Dispatcher()
