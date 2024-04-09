@@ -5,7 +5,9 @@ from aiogram.filters import Command, CommandObject, CommandStart
 from filters.is_admin import IsAdmin
 
 from parsers.wb_parser import wb_parser
-from photo_generators.tt_gen import tt_photo_gen
+from generators.tt_gen import tt_photo_gen
+from generators.first_gen import first_photo_gen
+from generators.video import video_gen
 
 
 router = Router()
@@ -22,16 +24,26 @@ async def start(message: Message):
 
 @router.message(Command('get'))
 async def get_wb(message: Message, command: CommandObject):
+    """
+    :param message:
+    :param command: txt (for first photo), url, url, ...
+    :return:
+    """
     if isinstance(command.args, int):
         return await message.answer("tu kto takoi syka")
 
-    urls = command.args.split(" ")
+    args = command.args.split(" ")
 
+    first_photo_gen(args[0])
+
+    urls = args[1:]
     res_tg = tg_post(urls, text='💜 WILDBERRIES 💜\n')
+    video_gen(len(urls), duration=2)
 
     await message.answer_media_group(media=res_tg[0])
     await message.answer(text=res_tg[2], parse_mode="MarkdownV2")
     await message.answer_media_group(media=res_tg[1])
+    await message.answer_video(FSInputFile(f"C:\\Users\\kiril\\Documents\\GitHub\\wb_parser\\data\\tt_post\\movie.mp4"))
 
 
 def tg_post(urls, text: str):
@@ -42,8 +54,9 @@ def tg_post(urls, text: str):
     :return: mediafiles for group, text for group,
     """
 
+    src_back = FSInputFile(f"C:\\Users\\kiril\\Documents\\GitHub\\wb_parser\\data\\tt_post\\back_res.png")
+    mediatt = [InputMediaPhoto(media=src_back)]
     mediatg = []
-    mediatt = []
     txt = text
     count = 0
     for url in urls:
